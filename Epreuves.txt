@@ -1,0 +1,12 @@
+#############################
+# Nom		Debut	Fin #
+#############################
+Maths		07:30	10:30
+Anglais		10:30	11:15
+Physique	08:00	10:00
+Electronique	10:45	12:30
+Chimie		10:15	12:15
+Informatique	09:00	11:00
+Espagnol	11:15	11:30
+Chinois		11:30	11:45
+Philosophie	10:15	11:30
