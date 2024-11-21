@@ -1,64 +1,74 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+package tp1_vEtudiants.exercice1;
 
-class Epreuve implements Comparable<Epreuve> {
-    String intitule;
-    int debut;
-    int fin;
+import java.sql.Time;
+import java.util.StringTokenizer;
 
-    public Epreuve(String intitule, int debut, int fin) {
-        this.intitule = intitule;
-        this.debut = debut;
-        this.fin = fin;
-    }
+public class Epreuve implements Comparable<Object>{
+	
+	private String intitule; 
+	private Time debut; 
+	private Time fin;
+	
+	
+	// Les horaires de debut et de fin doivent etre fournis au format hh:mm
+	public Epreuve(String intitule, String debut, String fin) {
+		this.intitule = intitule; 
+		
+		StringTokenizer st = new StringTokenizer(debut);
+		String hh = st.nextToken(":");
+		String mm = st.nextToken(":");
+		this.debut = new Time(Integer.parseInt(hh), Integer.parseInt(mm), 0);
+		
+		st = new StringTokenizer(fin);
+		hh = st.nextToken(":");
+		mm = st.nextToken(":");
+		this.fin = new Time(Integer.parseInt(hh), Integer.parseInt(mm), 0);
+		
+		// Pour corriger d'eventuelles inversions entre horaire de debut et de fin
+		if(this.debut.after(this.fin)) {
+			Time tmpTime = this.debut; 
+			this.debut = this.fin; 
+			this.fin = tmpTime;
+		}
+	}
 
-    public boolean conflict(Epreuve other) {
-        return this.fin > other.debut && this.debut < other.fin;
-    }
+	public String getIntitule() {
+		return intitule;
+	}
 
-    @Override
-    public int compareTo(Epreuve other) {
-        return Integer.compare(this.fin, other.fin);  // Tri par horaire de fin
-    }
-}
+	public void setIntitule(String intitule) {
+		this.intitule = intitule;
+	}
 
-class ListeEpreuves {
-    ArrayList<Epreuve> epreuves = new ArrayList<>();
+	public Time getDebut() {
+		return debut;
+	}
 
-    public void eliminerConflits(Epreuve e) {
-        epreuves.removeIf(ep -> ep.conflict(e));
-    }
+	public void setDebut(Time debut) {
+		this.debut = debut;
+	}
 
-    public ArrayList<Epreuve> planifierEpreuves() {
-        Collections.sort(epreuves);
-        ArrayList<Epreuve> planification = new ArrayList<>();
-        int dernierFin = -1;
-        for (Epreuve e : epreuves) {
-            if (e.debut >= dernierFin) {
-                planification.add(e);
-                dernierFin = e.fin;
-            }
-        }
-        return planification;
-    }
-}
+	public Time getFin() {
+		return fin;
+	}
 
-public class Main {
-    public static void main(String[] args) {
-        ListeEpreuves liste = new ListeEpreuves();
-        liste.epreuves.add(new Epreuve("Maths", 8, 10));
-        liste.epreuves.add(new Epreuve("Physique", 10, 12));
-        liste.epreuves.add(new Epreuve("Informatique", 9, 11));
-        liste.epreuves.add(new Epreuve("Espagnol", 12, 14));
+	public void setFin(Time fin) {
+		this.fin = fin;
+	}
+	
+	public String toString() {
+		return "Epreuve de " + intitule + " (" + debut +" --> " + fin + ")"; 
+	}
+	
+	// Cette methode servira a trier les epreuves selon les horaires de fin croissants.  
+	// Elle pourra etre adaptee pour realiser des tris suivant d'autres criteres.
+	public int compareTo(Object o) {
+    	Epreuve e = (Epreuve) o;
+    	
+    	if (this.fin.before(e.fin))
+    		return -1; 
+    	else 
+    		return 0;
+	}
 
-        // Test élimination des conflits
-        System.out.println("Liste avant élimination des conflits avec Physique:");
-        liste.eliminerConflits(new Epreuve("Physique", 10, 12));
-        System.out.println(liste.epreuves);
-
-        // Test planification des épreuves
-        ArrayList<Epreuve> planification = liste.planifierEpreuves();
-        System.out.println("Epreuves planifiées : " + planification);
-    }
 }
