@@ -54,9 +54,11 @@ public class ListeEpreuves {
 
 	public void eliminerConflits(Epreuve e) {
 
-    liste.removeIf(epreuve -> epreuve.getDebut().before(e.getFin()) && epreuve.getFin().after(e.getDebut()));
-			}
-
+		liste.removeIf(epreuve -> 
+		epreuve != e &&
+		epreuve.getDebut().before(e.getFin()) &&
+		epreuve.getFin().after(e.getDebut()) );
+	}
 
 	// Pour d'autres types de tri, vous pouvez modifier la methode compareTo(Object o) dans la classe Epreuve
 	public void triParHeureFin() {
@@ -106,5 +108,5 @@ public class ListeEpreuves {
 		}
 		return s; 
 	}
-}
 
+}
