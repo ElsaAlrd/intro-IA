@@ -29,8 +29,6 @@ public class ListeEpreuves {
 
     /**
      * Méthode pour lire le fichier contenant la liste des épreuves.
-     * Le fichier est lu ligne par ligne.
-     * Les lignes commençant par '#' sont ignorées, car elles sont considérées comme des commentaires.
      */
     public void lireFichierEpreuves(String fichier) {
         try {
@@ -42,7 +40,6 @@ public class ListeEpreuves {
             // Boucle pour lire tout le fichier ligne par ligne.
             while (ligne != null) {
 
-                // Ignore les lignes qui commencent par '#' (commentaires).
                 if (!ligne.startsWith("#")) {
                     // Tokenize la ligne pour extraire les informations de l'épreuve.
                     StringTokenizer st = new StringTokenizer(ligne);
