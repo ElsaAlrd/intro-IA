@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
-// Classe représentant une liste d'épreuves, avec diverses méthodes pour gérer et manipuler les épreuves.
+// Classe représentant une liste d'épreuves
 public class ListeEpreuves {
 
     // Attribut pour stocker le nom du fichier contenant la liste des épreuves.
