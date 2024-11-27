@@ -172,16 +172,40 @@ public class Algorithme_genetique {
 
 
 
-public class Selection_roulette extends Selection {
 
-    private ArrayList<Solution> population;
+public class SelectionRouletteBiaisee extends Selection {
+
     private Random random;
 
-    public Selection_roulette(ArrayList<Solution> population) {
+    public SelectionRouletteBiaisee(ArrayList<Solution> population) {
         super(population);
-        this.population = population;
         this.random = new Random();
     }
+
+    @Override
+    public Solution selectionner() {
+        // Calculer la somme des scores (fitness)
+        double sommeFitness = population.stream()
+                .mapToDouble(Solution::getFitness) // Supposons que Solution possède une méthode getFitness()
+                .sum();
+
+        // Générer une valeur aléatoire entre 0 et la somme des fitness
+        double seuil = random.nextDouble() * sommeFitness;
+
+        // Parcourir la population pour trouver l'élément correspondant
+        double cumul = 0.0;
+        for (Solution solution : population) {
+            cumul += solution.getFitness(); // Ajouter la fitness courante
+            if (cumul >= seuil) {
+                return solution;
+            }
+        }
+
+        // Si aucun n'est sélectionné (ce qui ne devrait pas arriver), retourner le dernier
+        return population.get(population.size() - 1);
+    }
+}
+
 
     @Override
     public Solution selectionner() {
