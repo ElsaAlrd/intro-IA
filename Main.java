@@ -1,3 +1,4 @@
+
 package algorithmes;
 
 import problemes.ChaineBinaire;
@@ -13,12 +14,15 @@ public class Main {
 		
 		double probaCroisement = .8; 
 		double probaMutation = 0.1;
+
+		int tailleTournoi = 5;
 		
 		int nbBits = 16;
+		int kPoints = 3;
 		Probleme probleme; 
 		probleme = new ChaineBinaire(nbBits); 
 		
-		Algorithme_genetique algo = new Algorithme_genetique(probleme, taille_population, nb_generations, probaCroisement, probaMutation); 
+		Algorithme_genetique algo = new Algorithme_genetique(probleme, taille_population, nb_generations, probaCroisement, probaMutation, kPoints); 
 		Solution best = algo.executer();
 		
 		System.out.println("Resultat: " + best);
