@@ -1,13 +1,14 @@
 package algorithmes;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
-import representation.Solution;
 import operateurs.selection.Selection_aleatoire;
+import operateurs.selection.Selection_roulette;
+import operateurs.selection.Selection_tournoi;
 import operateurs.croisement.Croisement;
 import operateurs.croisement.Croisement_1point;
+import operateurs.croisement.Croisement_2points;
+import operateurs.croisement.Croisement_kpoints;
 import operateurs.selection.Selection;
 import problemes.Probleme;
 import representation.Gene;
@@ -22,20 +23,25 @@ public class Algorithme_genetique {
 	private double probaCroisement; 
 	private double probaMutation;
 
+	private int tailleTournoi;
+
 	private int nb_variables_decision; 
+	private int kPoints;
 
 	private ArrayList<Solution> population; 
 	private ArrayList<Solution> populationFille; 
 
 	private Solution bestSolution;
-}
 
-	public Algorithme_genetique(Probleme probleme, int taille_population, int nb_generations, double probaCroisement, double probaMutation) {
+
+	public Algorithme_genetique(Probleme probleme, int taille_population, int nb_generations, double probaCroisement, double probaMutation, int kPoints) {
 		this.probleme = probleme;
 		this.taille_population = taille_population; 
 		this.nb_generations = nb_generations;
 		this.probaCroisement = probaCroisement; 
 		this.probaMutation = probaMutation;
+		this.tailleTournoi = tailleTournoi;
+		this.kPoints = kPoints;
 
 		this.population = new ArrayList<Solution>(taille_population);
 
@@ -59,7 +65,7 @@ public class Algorithme_genetique {
 		for (int generation = 1; generation < nb_generations; generation++) {
 
 	
-			selection = new Selection_aleatoire(population); 
+			selection = new Selection_tournoi(population, tailleTournoi); 
 
 
 			populationFille = new ArrayList<Solution>();
@@ -70,7 +76,7 @@ public class Algorithme_genetique {
 				Solution parent2 = selection.selectionner();
 
 				Croisement croisement; 
-				croisement = new Croisement_1point(parent1, parent2, probaCroisement);
+				croisement = new Croisement_kpoints(parent1, parent2, probaCroisement, kPoints);
 				croisement.croiser();
 
 				Solution enfant1 = croisement.getEnfant1();
@@ -146,7 +152,7 @@ public class Algorithme_genetique {
 		}
 
 		population.clear();
-		Selection selection = new Selection_aleatoire(population); ; 
+		Selection selection = new Selection_roulette(population); ; 
 
 		for (int i = 0; i < taille_population; i++) {
 			population.add(selection.selectionner());
@@ -172,128 +178,8 @@ public class Algorithme_genetique {
 			}
 		}
 
+		return best;
 
-
-public class Selection_roulette extends Selection {
-
-    private ArrayList<Solution> population;
-    private Random random;
-
-    public Selection_roulette(ArrayList<Solution> population) {
-        super(population);
-        this.population = population;
-        this.random = new Random();
-    }
-
-
-	
-	public class Croisement_2points extends Croisement {
-	
-		public Croisement_2points(Solution parent1, Solution parent2, double proba) {
-			super(parent1, parent2, proba);
-		}
-	
-		@Override
-		public void croiser() {
-	
-			int nb_variables_decision = parent1.getNb_variables_decision();
-	
-			enfant1 = new Solution(parent1);
-			enfant2 = new Solution(parent2);
-	
-			double aleatoire = Math.random();
-	
-			if (aleatoire <= proba) {
-				// Générer deux points de croisement distincts
-				int point1 = (int) (Math.random() * nb_variables_decision);
-				int point2 = (int) (Math.random() * nb_variables_decision);
-	
-				// Assurer que point1 < point2
-				if (point1 > point2) {
-					int temp = point1;
-					point1 = point2;
-					point2 = temp;
-				}
-	
-				// Copie des variables avant le premier point de croisement
-				for (int i = 0; i < point1; i++) {
-					enfant1.setVariable(i, parent1.getDoubleVariable(i));
-					enfant2.setVariable(i, parent2.getDoubleVariable(i));
-				}
-	
-				// Copie des variables entre les deux points de croisement
-				for (int i = point1; i < point2; i++) {
-					enfant1.setVariable(i, parent2.getDoubleVariable(i));
-					enfant2.setVariable(i, parent1.getDoubleVariable(i));
-				}
-	
-				// Copie des variables après le deuxième point de croisement
-				for (int i = point2; i < nb_variables_decision; i++) {
-					enfant1.setVariable(i, parent1.getDoubleVariable(i));
-					enfant2.setVariable(i, parent2.getDoubleVariable(i));
-				}
-			}
-		}
 	}
-	
-    @Override
-    public Solution selectionner() {
-        // Calculer la somme totale des aptitudes (f)
-        double sommeAptitudes = 0.0;
-        for (Solution s : population) {
-            sommeAptitudes += s.getF();
-        }
-
-        // Générer une valeur aléatoire dans [0, sommeAptitudes]
-        double seuil = random.nextDouble() * sommeAptitudes;
-
-        // Parcourir la population et trouver l'individu correspondant
-        double cumul = 0.0;
-        for (Solution s : population) {
-            cumul += s.getF();
-            if (cumul >= seuil) {
-                return s;
-            }
-        }
-
-        // Par sécurité, retourner le dernier individu
-        return population.get(population.size() - 1);
-    }
-
-
-public class SelectionRouletteBiaisee extends Selection {
-
-    private Random random;
-
-    public SelectionRouletteBiaisee(ArrayList<Solution> population) {
-        super(population);
-        this.random = new Random();
-    }
-
-    @Override
-    public Solution selectionner() {
-        // Calculer la somme des scores (fitness)
-        double sommeFitness = population.stream()
-                .mapToDouble(Solution::getFitness) // Supposons que Solution possède une méthode getFitness()
-                .sum();
-
-        // Générer une valeur aléatoire entre 0 et la somme des fitness
-        double seuil = random.nextDouble() * sommeFitness;
-
-        // Parcourir la population pour trouver l'élément correspondant
-        double cumul = 0.0;
-        for (Solution solution : population) {
-            cumul += solution.getFitness(); // Ajouter la fitness courante
-            if (cumul >= seuil) {
-                return solution;
-            }
-        }
-
-        // Si aucun n'est sélectionné (ce qui ne devrait pas arriver), retourner le dernier
-        return population.get(population.size() - 1);
-    }
-
-return best; 
 
 }
-
